@@ -1,5 +1,6 @@
 library;
 
+import 'package:flip_card/flip_card_controller.dart';
 import 'package:memorama/utilis/detalles.dart';
 import 'package:flutter/material.dart';
 
@@ -34,6 +35,7 @@ List<Detalles> inicio = [
 ];
 List <bool> initialState=[];
 List <String> cartas=[];
+List<FlipCardController> controllers = [];
 
 void inicializar(Nivel nivel){
   List<String> tmp=cards();
@@ -54,6 +56,7 @@ void inicializar(Nivel nivel){
   }
   for(int i=0;i<size;i++){
     initialState.add(true);
-    cartas.add(cards()[i]);
+    cartas.add(tmp[i]);
+    controllers.add(FlipCardController());
   }
 }
