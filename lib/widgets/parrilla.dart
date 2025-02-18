@@ -11,8 +11,8 @@ class Parrilla extends StatefulWidget {
 }
 
 class _ParrillaState extends State<Parrilla> {
-  int? clicked = 0, preclicked = -1;
-  bool? flag = false;
+  int? preclicked = -1;
+  bool? flag = false, habilitado = true;
   @override
   void initState() {
     // TODO: implement initState
@@ -27,34 +27,46 @@ class _ParrillaState extends State<Parrilla> {
       itemCount: cartas.length,
       shrinkWrap: true,
       gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       itemBuilder: (context, index) => FlipCard(
         onFlip: () {
           if (!flag!) {
              preclicked = index;
-             clicked = -1;
              flag = true;
           } else {
-            clicked = index;
             flag = false;
+            setState(() {
+              habilitado = false;
+            });
           }
-          if (preclicked != clicked) {
+          if (preclicked != index) {
             // Voltear las cartas
+            if (cartas.elementAt(index) == cartas.elementAt(preclicked!)) {
+              debugPrint("Son iguales");
+              setState(() {
+                initialState[preclicked!] = false;
+                initialState[index] = false;
+                habilitado = true;
+              });
+            } else {
+              // Voltear las cartas programáticamente
+              Future.delayed(Duration(milliseconds: 1000), () {
+                controllers.elementAt(preclicked!).toggleCard();
+                preclicked = index;
+                controllers.elementAt(index).toggleCard();
+                setState(() {
+                  habilitado = true;
+                });
+              },);
+
+            }
           }
-          if (cartas.elementAt(clicked!) == cartas.elementAt(preclicked!)) {
-            debugPrint("Clicked: Son iguales");
-          } else {
-            Future.delayed(Duration(seconds: 1), () {
-              controllers.elementAt(clicked!).toggleCard();
-              controllers.elementAt(preclicked!).toggleCard();
-            },);
-          }
-          debugPrint("Clicker: $preclicked");
-          debugPrint("Clicker: $clicked");
+          // Future.delayed(Duration(milliseconds: 100));
+
         },
           direction: FlipDirection.HORIZONTAL,
          fill: Fill.fillBack,
-         flipOnTouch: true,
+         flipOnTouch: habilitado!?initialState[index]:false,
           controller: controllers[index],
          // autoFlipDuration: const Duration(milliseconds: 500),
           back: Image.asset(cartas[index]),
